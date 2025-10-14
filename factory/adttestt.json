@@ -1,0 +1,9 @@
+{
+	"name": "adttestt",
+	"location": "southindia",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "ad9f80b3-c3c8-4baf-be10-4808be95afd2",
+		"tenantId": "21e6b10a-480b-46ef-8028-501066a46608"
+	}
+}
