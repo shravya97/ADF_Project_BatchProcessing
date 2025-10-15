@@ -1,17 +1,120 @@
 {
-	"name": "pipeline1",
+	"name": "pl_git_to_adls_source_data",
 	"properties": {
 		"activities": [
 			{
-				"name": "Wait1",
-				"type": "Wait",
+				"name": "act_forloop_filenames_input_git_parquet",
+				"type": "ForEach",
 				"dependsOn": [],
 				"userProperties": [],
 				"typeProperties": {
-					"waitTimeInSeconds": 1
+					"items": {
+						"value": "@pipeline().parameters.Inputparquetfilenamesgit",
+						"type": "Expression"
+					},
+					"isSequential": true,
+					"activities": [
+						{
+							"name": "act_copy_data_git_adls_parquet",
+							"type": "Copy",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [
+								{
+									"name": "purpose",
+									"value": "copy data dynamic from git to adls "
+								}
+							],
+							"typeProperties": {
+								"source": {
+									"type": "ParquetSource",
+									"storeSettings": {
+										"type": "HttpReadSettings",
+										"requestMethod": "GET"
+									},
+									"formatSettings": {
+										"type": "ParquetReadSettings"
+									}
+								},
+								"sink": {
+									"type": "ParquetSink",
+									"storeSettings": {
+										"type": "AzureBlobFSWriteSettings"
+									},
+									"formatSettings": {
+										"type": "ParquetWriteSettings"
+									}
+								},
+								"enableStaging": false,
+								"translator": {
+									"type": "TabularTranslator",
+									"typeConversion": true,
+									"typeConversionSettings": {
+										"allowDataTruncation": false,
+										"treatBooleanAsNumber": false
+									}
+								}
+							},
+							"inputs": [
+								{
+									"referenceName": "Parquet_input_ds",
+									"type": "DatasetReference",
+									"parameters": {
+										"filename": {
+											"value": "@item()",
+											"type": "Expression"
+										}
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "output_datalake_ds",
+									"type": "DatasetReference",
+									"parameters": {
+										"Folder": {
+											"value": "@pipeline().parameters.Inputfolder",
+											"type": "Expression"
+										},
+										"file": {
+											"value": "@item()",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						}
+					]
 				}
 			}
 		],
+		"parameters": {
+			"Inputparquetfilenamesgit": {
+				"type": "array",
+				"defaultValue": [
+					"customer_first.parquet",
+					"customers_second.parquet",
+					"orders_first.parquet",
+					"orders_second.parquet",
+					"products_first.parquet",
+					"products_second.parquet",
+					"regions.parquet"
+				]
+			},
+			"Inputfolder": {
+				"type": "string",
+				"defaultValue": "input"
+			}
+		},
+		"folder": {
+			"name": "Ingestion"
+		},
 		"annotations": [],
 		"lastPublishTime": "2025-10-08T05:39:44Z"
 	},

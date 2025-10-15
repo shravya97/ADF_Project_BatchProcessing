@@ -1,0 +1,32 @@
+{
+	"name": "Parquet_input_ds",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "HttpServer1",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"filename": {
+				"type": "array"
+			}
+		},
+		"folder": {
+			"name": "Source"
+		},
+		"annotations": [
+			"SourceType:GitHub"
+		],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "HttpServerLocation",
+				"relativeUrl": {
+					"value": "/aishincp/End-To-End-Data-Engineering-ETL-Pipeline-Project-Azure-Databricks-Spark-UnityCatalog/main/data/@{dataset().filename}",
+					"type": "Expression"
+				}
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": []
+	}
+}
